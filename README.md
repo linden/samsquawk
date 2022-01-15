@@ -8,4 +8,4 @@ go install github.com/linden/samsquawk
 samsquawk
 ```
 
-Set your SAM client to go to port 5050 instead of 7656
+Set your SAM client to use port 5050 instead of 7656.
