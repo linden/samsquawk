@@ -3,7 +3,7 @@ SAM(v3)Squawk is an intercepter/debugger for requests made to [`i2p`](https://ge
 
 #### Getting Started
 ```sh
-go install github.com/linden/samsquawk
+go install github.com/linden/samsquawk@latest
 
 samsquawk
 ```
