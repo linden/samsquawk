@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net"
 	"strings"
+
+	"go.uber.org/atomic"
 )
 
 var (
@@ -41,15 +43,15 @@ func main() {
 
 		defer host.Close()
 
-		go pipe(fmt.Sprintf("%sclient -> host%s", purple, clear), client, host)
-		go pipe(fmt.Sprintf("%shost -> client%s", green, clear), host, client)
+		ID := atomic.NewString("undefined")
+
+		go pipe(ID, fmt.Sprintf("%sclient -> host%s", purple, clear), client, host)
+		go pipe(ID, fmt.Sprintf("%shost -> client%s", green, clear), host, client)
 	}
 }
 
-func pipe(title string, a net.Conn, b net.Conn) {
+func pipe(ID *atomic.String, title string, a net.Conn, b net.Conn) {
 	buffer := make([]byte, 65535)
-
-	ID := "undefined"
 
 	for {
 		length, err := a.Read(buffer)
@@ -70,7 +72,7 @@ func pipe(title string, a net.Conn, b net.Conn) {
 				formatted += fmt.Sprintf("NEWLINETAB%sTAB%s%s%s", split[0], red, split[1], clear)
 
 				if split[0] == "ID" {
-					ID = split[1]
+					ID.Store(split[1])
 				}
 			} else {
 				if index != 0 {
@@ -88,7 +90,7 @@ func pipe(title string, a net.Conn, b net.Conn) {
 		formatted = strings.ReplaceAll(formatted, "NEWLINE", "\n")
 		formatted = strings.ReplaceAll(formatted, "TAB", "\t")
 
-		fmt.Printf("%s%s%s %s %s\n", bold, ID, clear, title, formatted)
+		fmt.Printf("%s%s%s %s %s\n", bold, ID.Load(), clear, title, formatted)
 
 		_, err = b.Write(cursor)
 
